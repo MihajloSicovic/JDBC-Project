@@ -11,9 +11,9 @@ public class sm230029_TagsOperations implements TagsOperations {
     public Integer addTag(Integer movieId, String tag) {
         String query = "SELECT idT FROM Tags WHERE name = ?";
         int tagId;
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, tag);
 
@@ -43,8 +43,7 @@ public class sm230029_TagsOperations implements TagsOperations {
         }
 
         query = "INSERT INTO MovieTags (movieId, tagId) VALUES (?, ?)";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+        try (PreparedStatement ps = conn.prepareStatement(query)) {
 
             ps.setInt(1, movieId);
             ps.setInt(2, tagId);
@@ -60,9 +59,9 @@ public class sm230029_TagsOperations implements TagsOperations {
     public Integer removeTag(Integer movieId, String tag) {
         String query = "DELETE FROM MovieTags WHERE movieId = ? AND " +
                 "(SELECT name FROM Tags WHERE tagId = idT) = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
             stmt.setString(2, tag);
@@ -77,9 +76,9 @@ public class sm230029_TagsOperations implements TagsOperations {
     @Override
     public int removeAllTagsForMovie(Integer movieId) {
         String query = "DELETE FROM MovieTags WHERE movieId = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
 
@@ -94,9 +93,9 @@ public class sm230029_TagsOperations implements TagsOperations {
     public boolean hasTag(Integer movieId, String tag) {
         String query = "SELECT * FROM MovieTags mt WHERE movieId = ? AND " +
                 "(SELECT name FROM Tags t WHERE mt.tagId = t.idT) = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
             stmt.setString(2, tag);
@@ -115,9 +114,9 @@ public class sm230029_TagsOperations implements TagsOperations {
         String query = "SELECT name FROM Tags t WHERE " +
                 "(SELECT movieId FROM MovieTags mt WHERE mt.tagId = t.idT) = ?";
         List<String> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
 
@@ -136,9 +135,9 @@ public class sm230029_TagsOperations implements TagsOperations {
         String query = "SELECT movieId FROM MovieTags WHERE " +
                 "(SELECT name FROM Tags WHERE tagId = idT) = ?";
         List<Integer> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, tag);
 
@@ -156,9 +155,9 @@ public class sm230029_TagsOperations implements TagsOperations {
     public List<String> getAllTags() {
         String query = "SELECT name FROM Tags";
         List<String> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next())

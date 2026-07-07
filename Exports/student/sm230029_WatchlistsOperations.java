@@ -13,9 +13,9 @@ public class sm230029_WatchlistsOperations implements WatchlistsOperations {
     @Override
     public boolean addMovieToWatchlist(Integer userId, Integer movieId) {
         String query = "INSERT INTO Watchlists (movieId, userId) VALUES (?, ?)";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
             stmt.setInt(2, userId);
@@ -30,9 +30,9 @@ public class sm230029_WatchlistsOperations implements WatchlistsOperations {
     @Override
     public boolean removeMovieFromWatchlist(Integer userId, Integer movieId) {
         String query = "DELETE FROM Watchlists WHERE movieId = ? AND userId = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
             stmt.setInt(2, userId);
@@ -47,9 +47,9 @@ public class sm230029_WatchlistsOperations implements WatchlistsOperations {
     @Override
     public boolean isMovieInWatchlist(Integer userId, Integer movieId) {
         String query = "SELECT * FROM Watchlists WHERE userId = ? AND movieId = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, userId);
             stmt.setInt(2, movieId);
@@ -67,9 +67,9 @@ public class sm230029_WatchlistsOperations implements WatchlistsOperations {
     public List<Integer> getMoviesInWatchlist(Integer userId) {
         String query = "SELECT movieId FROM Watchlists WHERE userId = ?";
         List<Integer> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, userId);
 
@@ -87,9 +87,9 @@ public class sm230029_WatchlistsOperations implements WatchlistsOperations {
     public List<Integer> getUsersWithMovieInWatchlist(Integer movieId) {
         String query = "SELECT userId FROM Watchlists WHERE movieId = ?";
         List<Integer> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
 

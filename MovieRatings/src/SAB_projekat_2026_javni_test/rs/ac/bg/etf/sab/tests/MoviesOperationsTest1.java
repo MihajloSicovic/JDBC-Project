@@ -206,8 +206,8 @@ public class MoviesOperationsTest1 {
         Integer rising = this.movies.addMovie("The Apartment", g, "Billy Wilder");
         this.addRatingsFromNewUsers(classic, "classic_user_", 5, 8);
         Assert.assertEquals("Classic", this.movies.getMovieTrend(classic));
-        this.addRatingsFromNewUsers(falling, "falling_high_user_", 3, 10);
-        this.addRatingsFromNewUsers(falling, "falling_low_user_", 3, 1);
+        this.addRatingsFromNewUsers(falling, "falling_high_user_", 5, 10);
+        this.addRatingsFromNewUsers(falling, "falling_low_user_", 5, 1);
         Assert.assertEquals("Falling", this.movies.getMovieTrend(falling));
         this.addRatingsFromNewUsers(rising, "rising_low_user_", 5, 1);
         this.addRatingsFromNewUsers(rising, "rising_high_user_", 5, 10);

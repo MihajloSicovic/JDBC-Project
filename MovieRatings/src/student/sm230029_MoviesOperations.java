@@ -10,9 +10,9 @@ public class sm230029_MoviesOperations implements MoviesOperations {
     @Override
     public Integer addMovie(String title, Integer genreId, String director) {
         String query = "INSERT INTO Movies (title, director) VALUES (?, ?)";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, title);
             stmt.setString(2, director);
@@ -48,9 +48,9 @@ public class sm230029_MoviesOperations implements MoviesOperations {
     @Override
     public Integer updateMovieTitle(Integer id, String title) {
         String query = "UPDATE Movies SET title = ? WHERE idM = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, title);
             stmt.setInt(2, id);
@@ -65,9 +65,9 @@ public class sm230029_MoviesOperations implements MoviesOperations {
     @Override
     public Integer addGenreToMovie(Integer movieId, Integer genreId) {
         String query = "INSERT INTO MovieGenres (movieId, genreId) VALUES (?, ?)";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
             stmt.setInt(2, genreId);
@@ -82,9 +82,9 @@ public class sm230029_MoviesOperations implements MoviesOperations {
     @Override
     public Integer removeGenreFromMovie(Integer movieId, Integer genreId) {
         String query = "DELETE FROM MovieGenres WHERE movieId = ? AND genreId = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
             stmt.setInt(2, genreId);
@@ -99,9 +99,9 @@ public class sm230029_MoviesOperations implements MoviesOperations {
     @Override
     public Integer updateMovieDirector(Integer id, String director) {
         String query = "UPDATE Movies SET director = ? WHERE idM = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, director);
             stmt.setInt(2, id);
@@ -116,9 +116,9 @@ public class sm230029_MoviesOperations implements MoviesOperations {
     @Override
     public Integer removeMovie(Integer id) {
         String query = "DELETE FROM Movies WHERE idM = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, id);
 
@@ -133,9 +133,9 @@ public class sm230029_MoviesOperations implements MoviesOperations {
     public List<Integer> getMovieIds(String title, String director) {
         String query = "SELECT idM FROM Movies WHERE title = ? AND director = ?";
         List<Integer> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, title);
             stmt.setString(2, director);
@@ -154,9 +154,9 @@ public class sm230029_MoviesOperations implements MoviesOperations {
     public List<Integer> getAllMovieIds() {
         String query = "SELECT idM FROM Movies";
         List<Integer> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next())
@@ -171,9 +171,9 @@ public class sm230029_MoviesOperations implements MoviesOperations {
     public List<Integer> getMovieIdsByGenre(Integer genreId) {
         String query = "SELECT movieId FROM MovieGenres WHERE genreId = ?";
         List<Integer> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, genreId);
 
@@ -191,9 +191,9 @@ public class sm230029_MoviesOperations implements MoviesOperations {
     public List<Integer> getGenreIdsForMovie(Integer movieId) {
         String query = "SELECT genreId FROM MovieGenres WHERE movieId = ?";
         List<Integer> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
 
@@ -211,9 +211,9 @@ public class sm230029_MoviesOperations implements MoviesOperations {
     public List<Integer> getMovieIdsByDirector(String director) {
         String query = "SELECT idM FROM Movies WHERE director = ?";
         List<Integer> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, director);
 
@@ -230,9 +230,9 @@ public class sm230029_MoviesOperations implements MoviesOperations {
     @Override
     public String getMovieTrend(Integer movieId) {
         String query = "SELECT status FROM Movies WHERE idM = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
 

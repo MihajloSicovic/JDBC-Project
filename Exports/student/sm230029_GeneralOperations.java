@@ -25,8 +25,9 @@ public class sm230029_GeneralOperations implements GeneralOperations {
                 "DBCC CHECKIDENT ('Genres', RESEED, 0);\n" +
                 "DBCC CHECKIDENT ('Users', RESEED, 0);";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        Connection conn = DB.getConnection();
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             conn.setAutoCommit(false);
 
@@ -35,6 +36,14 @@ public class sm230029_GeneralOperations implements GeneralOperations {
         }
         catch (SQLException e) {
             e.printStackTrace();
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {}
+        }
+        finally {
+            try {
+                conn.setAutoCommit(true);
+            } catch (SQLException ex) {}
         }
     }
 }

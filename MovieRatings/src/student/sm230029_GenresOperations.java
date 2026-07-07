@@ -10,9 +10,9 @@ public class sm230029_GenresOperations implements GenresOperations {
     @Override
     public Integer addGenre(String name) {
         String query = "INSERT INTO Genres (name) VALUES (?)";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, name);
 
@@ -31,9 +31,9 @@ public class sm230029_GenresOperations implements GenresOperations {
     @Override
     public Integer updateGenre(Integer id, String name) {
         String query = "UPDATE Genres SET name = ? WHERE idG = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, name);
             stmt.setInt(2, id);
@@ -48,9 +48,9 @@ public class sm230029_GenresOperations implements GenresOperations {
     @Override
     public Integer removeGenre(Integer id) {
         String query = "DELETE FROM Genres WHERE idG = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, id);
 
@@ -64,9 +64,9 @@ public class sm230029_GenresOperations implements GenresOperations {
     @Override
     public boolean doesGenreExist(String name) {
         String query = "SELECT * FROM Genres WHERE name = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, name);
 
@@ -82,9 +82,9 @@ public class sm230029_GenresOperations implements GenresOperations {
     @Override
     public Integer getGenreId(String name) {
         String query = "SELECT * FROM Genres WHERE name = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, name);
 
@@ -102,9 +102,9 @@ public class sm230029_GenresOperations implements GenresOperations {
     public List<Integer> getAllGenreIds() {
         String query = "SELECT idG FROM Genres";
         List<Integer> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next())

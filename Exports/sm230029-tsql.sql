@@ -17,12 +17,13 @@ BEGIN
 	INTO @movieId;
 
 	WITH RatingsCount30 AS (
-		SELECT COUNT(*) AS cnt
+		SELECT TOP 10 PERCENT COUNT(*) AS cnt
 		FROM Ratings
-		WHERE Date >= DATEADD(DAY, -30, GETDATE()) 
+		WHERE Date >= DATEADD(DAY, -30, GETDATE())
 		GROUP BY MovieId
+		ORDER BY COUNT(*) DESC
 	)
-	SELECT @maxRatings = MAX(cnt) FROM RatingsCount30;
+	SELECT @maxRatings = MIN(cnt) FROM RatingsCount30;
 
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
@@ -37,27 +38,28 @@ BEGIN
 			WHERE MovieId = @movieId
 			ORDER BY Date DESC
 		)
-		SELECT @avgRating = AVG(Score) FROM LatestRatings;
+		SELECT @avgRating = AVG(Score * 1.0) FROM LatestRatings;
 		
-		SELECT @avg = AVG(Score) FROM Ratings
+		SELECT @avg = AVG(Score * 1.0) FROM Ratings
 		WHERE MovieId = @movieId;
 
 		UPDATE m
 		SET Status = 
 		CASE
+
+			WHEN @avgRating >= @avg + 1
+			THEN 'Rising'
+
+			WHEN @avgRating <= @avg - 1
+			THEN 'Falling'
+
 			WHEN 
 			(SELECT COUNT(*) FROM Ratings WHERE MovieId = @movieId) >= 3
 			AND 
 			@avg >= 8
 			THEN 'Classic'
 
-			WHEN @avgRating <= @avg + 1
-			THEN 'Falling'
-
-			WHEN @avgRating >= @avg + 1
-			THEN 'Rising'
-
-			WHEN @ratingsCount30 = @maxRatings
+			WHEN @ratingsCount30 >= @maxRatings
 			THEN 'Trending'
 
 			ELSE NULL
@@ -80,21 +82,45 @@ ON Ratings
 AFTER INSERT, UPDATE
 AS
 BEGIN
-	DECLARE @userId INT, @score INT, @movieId INT
-	
-	SELECT @userId = UserId, @movieId = MovieId, @score = Score FROM inserted
-
-	IF (@score IN (1, 10) 
-		AND 
-		(SELECT COUNT(*) FROM Ratings WHERE Score IN (1, 10) AND UserId = @userId AND MovieId IN 
-			(SELECT DISTINCT MovieId FROM MovieGenres WHERE GenreId IN 
-				(SELECT DISTINCT GenreId FROM MovieGenres WHERE MovieId = @movieId))) > 4
-		AND
-		(SELECT COUNT(*) FROM Ratings WHERE Score IN (6, 7, 8) AND UserId = @userId AND MovieId IN 
-			(SELECT DISTINCT MovieId FROM MovieGenres WHERE GenreId IN 
-				(SELECT DISTINCT GenreId FROM MovieGenres WHERE MovieId = @movieId))) < 3
-		)
-		THROW 50001, 'You can not add another extreme score', 1;
+	IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        WHERE i.Score IN (1, 10)
+          AND (
+                SELECT COUNT(*)
+                FROM Ratings r
+                WHERE r.Score IN (1, 10)
+                  AND r.UserId = i.UserId
+                  AND r.MovieId IN (
+                        SELECT DISTINCT mg2.MovieId
+                        FROM MovieGenres mg2
+                        WHERE mg2.GenreId IN (
+                              SELECT DISTINCT mg1.GenreId
+                              FROM MovieGenres mg1
+                              WHERE mg1.MovieId = i.MovieId
+                        )
+                  )
+              ) > 4
+          AND (
+                SELECT COUNT(*)
+                FROM Ratings r2
+                WHERE r2.Score IN (6, 7, 8)
+                  AND r2.UserId = i.UserId
+                  AND r2.MovieId IN (
+                        SELECT DISTINCT mg4.MovieId
+                        FROM MovieGenres mg4
+                        WHERE mg4.GenreId IN (
+                              SELECT DISTINCT mg3.GenreId
+                              FROM MovieGenres mg3
+                              WHERE mg3.MovieId = i.MovieId
+                        )
+                  )
+              ) < 3
+    )
+    BEGIN
+        ROLLBACK TRANSACTION;
+        THROW 50001, 'You can not add another extreme score', 1;
+    END
 END;
 GO
 
@@ -107,7 +133,7 @@ AS
 RETURN
 (
     SELECT mg.MovieId as MovieId, 
-		AVG(Score) as AverageScore
+		AVG(Score * 1.0) as AverageScore
 	FROM Ratings r
 	JOIN MovieGenres mg ON mg.MovieId = r.MovieId
 	WHERE GenreId IN (
@@ -116,7 +142,7 @@ RETURN
 		JOIN Ratings r1 ON mg1.MovieId = r1.MovieId
 		WHERE UserId = @UserId
 		GROUP BY GenreId
-		HAVING AVG(Score) >= 8
+		HAVING AVG(Score * 1.0) >= 8
 	)
 	AND r.MovieId NOT IN (
 		SELECT MovieId FROM Ratings WHERE UserId = @UserId
@@ -124,7 +150,7 @@ RETURN
 		SELECT MovieId FROM WatchLists WHERE UserId = @UserId
 	)
 	GROUP BY mg.MovieId
-	HAVING (COUNT(*) >= 4 AND AVG(Score) >= 7.5) OR (COUNT(*) < 4 AND AVG(Score) >= 9)
+	HAVING (COUNT(*) >= 4 AND AVG(Score * 1.0) >= 7.5) OR (COUNT(*) < 4 AND AVG(Score * 1.0) >= 9)
 );
 GO
 
@@ -152,11 +178,11 @@ CREATE OR ALTER FUNCTION FN_UserDescription
 RETURNS NVARCHAR(20)
 AS
 BEGIN
-    IF ((SELECT COUNT(*) FROM Ratings WHERE UserId = @UserId) < 10) RETURN 'nedefinisan'
+    IF ((SELECT COUNT(*) FROM Ratings WHERE UserId = @UserId) < 10) RETURN 'undefined'
 
 	IF ((SELECT COUNT(DISTINCT TagId) FROM Ratings r 
 		JOIN MovieTags mt ON r.MovieId = mt.MovieId
-		WHERE UserId = @UserId) >= 10) RETURN 'radoznao'
+		WHERE UserId = @UserId) >= 10) RETURN 'curious'
 
     RETURN 'focused';
 END;
@@ -180,11 +206,11 @@ BEGIN
 				JOIN Ratings r1 ON mg1.MovieId = r1.MovieId
 				WHERE UserId = @UserId
 				GROUP BY GenreId
-				HAVING AVG(Score) >= 8
+				HAVING AVG(Score * 1.0) >= 8
 			)
 		)	
 		AND 
-		COALESCE((SELECT AVG(Score) FROM Ratings WHERE UserId <> @UserId AND MovieId = @MovieId), 0) < 6
+		COALESCE((SELECT AVG(Score * 1.0) FROM Ratings WHERE UserId <> @UserId AND MovieId = @MovieId), 0) < 6
 	)
 	UPDATE Users SET Rewards += 1 WHERE IdU = @UserId
 END;

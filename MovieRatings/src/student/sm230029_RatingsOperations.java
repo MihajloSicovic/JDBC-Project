@@ -10,9 +10,9 @@ public class sm230029_RatingsOperations implements RatingsOperations {
     @Override
     public boolean addRating(Integer userId, Integer movieId, Integer score) {
         String query = "INSERT INTO Ratings (userId, movieId, score) VALUES (?, ?, ?)";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, userId);
             stmt.setInt(2, movieId);
@@ -28,9 +28,9 @@ public class sm230029_RatingsOperations implements RatingsOperations {
     @Override
     public boolean updateRating(Integer userId, Integer movieId, Integer newScore) {
         String query = "UPDATE Ratings SET score = ? WHERE movieId = ? AND userId = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, newScore);
             stmt.setInt(2, movieId);
@@ -46,9 +46,9 @@ public class sm230029_RatingsOperations implements RatingsOperations {
     @Override
     public boolean removeRating(Integer userId, Integer movieId) {
         String query = "DELETE FROM Ratings WHERE movieId = ? AND userId = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
             stmt.setInt(2, userId);
@@ -63,9 +63,9 @@ public class sm230029_RatingsOperations implements RatingsOperations {
     @Override
     public Integer getRating(Integer userId, Integer movieId) {
         String query = "SELECT score FROM Ratings WHERE userId = ? AND movieId = ?";
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, userId);
             stmt.setInt(2, movieId);
@@ -84,9 +84,9 @@ public class sm230029_RatingsOperations implements RatingsOperations {
     public List<Integer> getRatedMoviesByUser(Integer userId) {
         String query = "SELECT movieId FROM Ratings WHERE userId = ?";
         List<Integer> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, userId);
 
@@ -104,9 +104,9 @@ public class sm230029_RatingsOperations implements RatingsOperations {
     public List<Integer> getUsersWhoRatedMovie(Integer movieId) {
         String query = "SELECT userId FROM Ratings WHERE movieId = ?";
         List<Integer> list = new ArrayList<>();
+        Connection conn = DB.getConnection();
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setInt(1, movieId);
 

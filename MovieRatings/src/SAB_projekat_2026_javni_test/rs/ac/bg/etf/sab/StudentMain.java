@@ -24,5 +24,7 @@ public class StudentMain {
                 watchlistsOperations,
                 generalOperations);
         TestRunner.runTests();
+
+        DB.getConnection().close();
     }
 }
